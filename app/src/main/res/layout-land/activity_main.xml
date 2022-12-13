@@ -32,6 +32,15 @@
             android:text="@string/false_button" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/result_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/result"
+        android:layout_gravity="bottom|center_horizontal"
+        android:padding="44dp"
+        android:drawablePadding="30dp"/>
+
     <Button
         android:id="@+id/next_button"
         style="?android:attr/buttonBarButtonStyle"
@@ -41,4 +50,6 @@
         android:drawableEnd="@drawable/arrow_right"
         android:drawablePadding="4dp"
         android:text="@string/next_button" />
+
+
 </FrameLayout>

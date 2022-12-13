@@ -8,9 +8,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,23 +22,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var questionTextView: TextView
     private lateinit var oldColors: ColorStateList
     private lateinit var resultLabel: TextView
-    private val questionBank = listOf(
-        Question(R.string.question_australia, true),
-        Question(R.string.question_oceans, true),
-        Question(R.string.question_mideast, false),
-        Question(R.string.question_africa, false),
-        Question(R.string.question_americas, true),
-        Question(R.string.question_asia, true)
-    )
-    private var currentIndex = 0
-    private var correctAnswers = 0.0 // Количество правильных ответов
-    private var totalAnswers = 0 // Сколько ответов получено всего
+
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProvider(this)[QuizViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
-
         setContentView(R.layout.activity_main)
+
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        quizViewModel.currentIndex = currentIndex
+
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
@@ -51,12 +49,18 @@ class MainActivity : AppCompatActivity() {
             checkAnswer(false, it)
         }
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
+            quizViewModel.moveToNext()
             updateQuestion()
             updateButtons()
         }
         updateQuestion()
         updateButtons()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.i(TAG, "onSaveInstanceState")
+        outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
     }
 
     override fun onStart() {
@@ -90,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
     }
 
@@ -98,19 +102,14 @@ class MainActivity : AppCompatActivity() {
      * Check user answer
      */
     private fun checkAnswer(userAnswer: Boolean, view: View) {
-        totalAnswers++
-        val question = questionBank[currentIndex]
-        question.userAnswer = userAnswer
-        val correctAnswer = question.answer
+        quizViewModel.userAnswer = userAnswer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
         var messageResId = R.string.correct_message
         var color = ContextCompat.getColor(this, R.color.blue)
         if (userAnswer != correctAnswer) {
             messageResId = R.string.incorrect_message
             color = ContextCompat.getColor(this, R.color.red)
-        } else {
-            correctAnswers++
         }
-
         val snackBar: Snackbar = Snackbar.make(view, messageResId, Snackbar.LENGTH_SHORT)
         snackBar.setBackgroundTint(color)
         snackBar.show()
@@ -118,28 +117,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateButtons() {
-        val question = questionBank[currentIndex]
-        if (question.userAnswer == null) {
+        if (quizViewModel.isAnswered) {
+            trueButton.isEnabled = false
+            falseButton.isEnabled = false
+            questionTextView.setTextColor(
+                ContextCompat.getColor(
+                    this,
+                    if (quizViewModel.isRightAnswer) R.color.blue else R.color.red
+                )
+            )
+        } else {
             trueButton.isEnabled = true
             falseButton.isEnabled = true
             questionTextView.setTextColor(oldColors)
-
-        } else {
-            trueButton.isEnabled = false
-            falseButton.isEnabled = false
-            if (question.userAnswer == question.answer) {
-                questionTextView.setTextColor(ContextCompat.getColor(this, R.color.blue))
-            } else {
-                questionTextView.setTextColor(ContextCompat.getColor(this, R.color.red))
-            }
         }
-        if (totalAnswers == 0) {
-            resultLabel.text = getString(R.string.result, 0.0)
-        } else {
-            resultLabel.text = getString(
-                R.string.result,
-                (correctAnswers / totalAnswers * 100)
-            )
-        }
+        resultLabel.text = getString(R.string.result, quizViewModel.percentRightAnswers)
     }
 }
