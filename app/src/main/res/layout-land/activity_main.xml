@@ -33,23 +33,50 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/version_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/api_level"
+        android:textSize="12sp" />
+
+    <TextView
         android:id="@+id/result_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/result"
         android:layout_gravity="bottom|center_horizontal"
-        android:padding="44dp"
-        android:drawablePadding="30dp"/>
+        android:drawablePadding="30dp"
+        android:padding="50dp"
+        android:text="@string/result" />
 
-    <Button
-        android:id="@+id/next_button"
-        style="?android:attr/buttonBarButtonStyle"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:drawableEnd="@drawable/arrow_right"
-        android:drawablePadding="4dp"
-        android:text="@string/next_button" />
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/cheat_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cheat_button" />
 
+        <TextView
+            android:id="@+id/cheats_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="@string/you_have_cheats" />
+
+        <Button
+            android:id="@+id/next_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/arrow_right"
+            android:drawablePadding="4dp"
+            android:text="@string/next_button" />
+    </LinearLayout>
 </FrameLayout>
