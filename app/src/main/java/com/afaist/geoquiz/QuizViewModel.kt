@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 
 class QuizViewModel : ViewModel() {
     var currentIndex = 0
+    var numberOfHints = 3
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
         Question(R.string.question_oceans, true),
@@ -22,7 +23,11 @@ class QuizViewModel : ViewModel() {
         set(value) {
             questionBank[currentIndex].userAnswer = value
         }
-
+    var isCheater
+        get() = questionBank[currentIndex].isCheater
+        set(value) {
+            questionBank[currentIndex].isCheater = value
+        }
     /**
      * Count percent right answers
      */
@@ -43,10 +48,11 @@ class QuizViewModel : ViewModel() {
         get() = questionBank[currentIndex].userAnswer != null
 
     val isRightAnswer: Boolean
-    get() {
-        val question = questionBank[currentIndex]
-        return question.userAnswer == question.answer
-    }
+        get() {
+            val question = questionBank[currentIndex]
+            return question.userAnswer == question.answer
+        }
+
     fun moveToNext() {
         currentIndex = (currentIndex + 1) % questionBank.size
     }
